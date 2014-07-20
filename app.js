@@ -1,10 +1,10 @@
-var express = require('express')
-  , routes = require('./router')
-  , nunjucks = require('nunjucks')
-  , http = require('http')
-  , path = require('path');
+var express     = require('express')
+  , routes      = require('./router')
+  , nunjucks    = require('nunjucks')
+  , http        = require('http')
+  , path        = require('path');
 
-var app = express();
+var app         = express();
 
 //nunjucks setup
 var env = new nunjucks.Environment(new nunjucks.FileSystemLoader(__dirname + '/views'), { 
@@ -53,10 +53,42 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
+app.configure('production', function(){
+  app.use(express.errorHandler());
+});
+
+
+// routes to serve the static HTML files
+app.get('/contact', function(req, res) {
+    res.sendfile(html_dir + 'contact.html');
+});
+// Note: route names need not match the file name
+app.get('/hello', function(req, res) {
+    res.sendfile(html_dir + 'hello.html');
+});
+
+//nunjucks
+var itemsList = [
+      { name : 'item #11', price: '$1202' },
+      { name : 'item #21', price: '$1229' },
+      { name : 'item #31', price: '$1249' },
+      { name : 'item #41', price: '$1253' },
+    ]
+
+app.get('/index2', function(req, res) {
+  // console.log("booo")
+  res.render('index2.html', {
+            title : 'Nunjucks Page',
+            items : itemsList
+  });
+});
+
+
+
 // Connect mongoose
 var options = {};
-var mongo = require('./db/mongo-store');
-mongo(options);
+// var mongo = require('./db/mongo-store');
+// mongo(options);
 
 // Setup routes
 routes(app, options);
